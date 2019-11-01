@@ -1,3 +1,4 @@
+//Salva imagem em .JPG no _dir local
 saveJpeg('slider0');
 
 function saveJpeg(name) {
