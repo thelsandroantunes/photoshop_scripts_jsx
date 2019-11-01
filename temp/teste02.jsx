@@ -2,26 +2,22 @@
 main();
 
 function main(){
+	// get a reference to the current (active) document and store it in a variable named "doc"
+	doc = app.activeDocument;  
 
-	var doc = app.activeDocument;
-	var docCopy = app.activeDocument.duplicate();
-	var sizeArr = [512,256,128,96,64,48,32,24,20,16];
-	var iconName = "slide0"
+	// change the color mode to RGB.  Important for resizing GIFs with indexed colors, to get better results
+	doc.changeMode(ChangeMode.RGB);  
 
-	var sfw = new ExportOptionsSaveForWeb();
-		sfw.format = SaveDocumentType.PNG;
-		sfw.PNG8 = false; //use PNG-24
-		sfw.transparency = true;
+	// these are our values for the end result width and height (in pixels) of our image
+	var fWidth = 1343;
+	var fHeight = 508;
 
-	for (var i = 0; i < sizeArr.length; i++) {
-		var file = new File(doc.path + '/' + iconName + "-" + sizeArr[i] + ".png");
-		var opts = new JPEGSaveOptions();
-//		var file = new File(doc.path + '/' + name + '.jpg');
-
-		docCopy.resizeImage(UnitValue(sizeArr[i], "px"), UnitValue(sizeArr[i],"px"), null, ResampleMethod.BICUBIC)
-		docCopy.exportDocument(file, ExportType.SAVEFORWEB, sfw);
-		
-	    opts.quality = 12;
-	    doc.saveAs(file, opts, true);
-	}	
+	// do the resizing.  if height > width (portrait-mode) resize based on height.  otherwise, resize based on width
+	if (doc.height > doc.width) {
+	    doc.resizeImage(null,UnitValue(fHeight,"px"),null,ResampleMethod.BICUBIC);
+	}
+	else {
+	    doc.resizeImage(UnitValue(fWidth,"px"),null,null,ResampleMethod.BICUBIC);
+	}
+	
 }
