@@ -1,34 +1,65 @@
-// Learn how to change text
-// how to save JPEG
-// how to read JSON
+#target photoshop
 
+///// 初期設定 /////
+//作者名
+auther = "Teste";
 
-var titleGroup = app.activeDocument.layerSets.getByName('title');
-var titleLayer = titleGroup.layers[0];
-titleLayer.textItem.contents = 'SIZE';
+//メインルーチン
+defUnit = preferences.rulerUnits; //現在の単位設定を記録
+    getInfo();
+preferences.rulerUnits = defUnit; //元の単位に戻す
 
-var doc = app.activeDocument;
+function getInfo() {
+    //アクティブドキュメントを取得
+    var doc = activeDocument;
+ 
+    //パス取得
+    var docPath = doc.fullName.fsName.toString();
+    docPath = docPath.substring(0,docPath.lastIndexOf("\\")+1); //パス名
+
+    //ファイル名取得
+    var docName = doc.name;
+    docName = docName.substring(0,docName.lastIndexOf(".")); //拡張子除去
+
+    //ページサイズ取得
+    preferences.rulerUnits = Units.PIXELS; //単位ピクセル
+    //preferences.rulerUnits = Units.MM; //単位mm
+    var doc_h = doc.height.value;
+    var doc_w = doc.width.value;
+
+    //データ情報の出力（見開き除外）
+    var dateObj = new Date();
+    var year = dateObj.getFullYear();
+    var month = dateObj.getMonth() + 1;
+    var date = dateObj.getDate();
+    var hour = dateObj.getHours();
+    if (hour < 10) hour = "0" + hour;
+    var min = dateObj.getMinutes();
+    if (min < 10) min = "0" + min;
+    var timeStr = year + "/" + month + "/" + date + " " + hour + ":" + min; //日時
     
-    var width = doc.width; 
-    var height = doc.height; 
+    //出力データ
+    var text = "[" + auther + "] " + doc_w  + " x " + doc_h; //解像度
+    //var text = "[" + auther + "] " + docName + " (" + timeStr + ") "; //ファイル名と時間
 
-    if (width <= height) { 
-        var borderSize = Math.round(width * 0.15); 
-    } else { 
-        var borderSize = Math.round(height * 0.15); 
-    } 
-
-    doc.resizeCanvas(width + borderSize, height + borderSize);
-
+    var newLayer = doc.artLayers.add(); // 新規レイヤーを追加
+    newLayer.kind = LayerKind.TEXT; // レイヤー種別をテキストレイヤーに設定
+    newLayer.textItem.contents = text // テキストレイヤーに文字列を設定
+    newLayer.name = "[INFO]"; //レイヤー名
     
-    var width = doc.width; 
-    var height = doc.height; 
-    var newSize = Math.round(Math.sqrt(width * width + height * height)) + borderSize; 
-    doc.resizeCanvas(newSize, newSize);
-
-    var file = new File(doc.path + '/' + name + '.jpg');
-
-    var opts = new JPEGSaveOptions();
-    opts.quality = 12;
-
-    doc.saveAs(file, opts, true);
+    //表示位置
+    preferences.rulerUnits = Units.MM; //単位mm
+    var x = 20; //left
+    var y = 10; //top
+    newLayer.textItem.position = [x, y]; // レイヤー位置を指定
+    newLayer.textItem.font = "MS-Gothic"; // フォント名
+    newLayer.textItem.size = 10; // フォントサイズ
+    newLayer.textItem.antiAliasMethod.NONE; //アンチエイリアス
+    //newLayer.textItem.justification.CENTER; //行揃え
+    
+    //レイヤー統合
+    //doc.flatten();
+    
+    //上書き保存
+    //doc.save();
+}
